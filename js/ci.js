@@ -147,7 +147,10 @@ function printAll(){
       <Bounds X="2440" Y="57" Width="476" Height="1301" />
     </ObjectInfo>
   </DieCutLabel>`;
-  var label = dymo.label.framework.openLabelXml(labelXml);
+  //print from file
+  var label = DYMO.Label.Framework.Label.Open("../label/cimo.label");
+
+  // var label = dymo.label.framework.openLabelXml(labelXml);
  // create label set to print data
  var labelSetBuilder = new dymo.label.framework.LabelSetBuilder();
 
