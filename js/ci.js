@@ -1,54 +1,18 @@
 // logic for CI - clothes import
 var start_g = 0;
 var ciArr = [];
+const BARCODE = 0;
+const CATEGORY = 1;
+const PRICE = 2;
+
 Number.prototype.pad = function(size) {
   var s = String(this);
   while (s.length < (size || 2)) {s = "0" + s;}
   return s;
 }
 
-function addCi(){
-  if(document.getElementById('formCi').reportValidity()){// form validation check
-    var start = document.getElementById('startNumber');
-    if(start_g === 0){ // first add
-      // disable start input
-      start.disabled = true;
-    }
-    var repeat = document.getElementById('repeat').value;
-    var content = '';
-    var customerId = document.getElementById('customerId').value;
-    var dateCi = document.getElementById('date').value;
-    var category = document.getElementById('category').value;
-    var price = document.getElementById('price').value;
-    
-    for(var i=0; i<repeat;i++){
-      ciArr.push([Number(start.value)+i,category,price]);
-      content += `<tr>
-      <th scope="row">${customerId}</th>
-      <td>${dateCi}</td>
-      <td>${Number(start.value)+i}</td>
-      <td>${category}</td>
-      <td>${price}k</td>
-      <td>
-        <button class="btn-danger deleteBtn">Delete</button>
-        <button class="btn-info reprintBtn">Reprint</button>
-      </td>
-    </tr>`; 
-    }
-    document.getElementById('tableCi').getElementsByTagName('tbody')[0].innerHTML += content;
-    // update global start
-    start_g = Number(start.value) + Number(repeat);
-    // update startNumber view;
-    start.value = start_g;
-  }
-}
-
-function printAll(){
-  var customerId = document.getElementById('customerId').value;
-  var dateArr = document.getElementById('date').value.split('-'); // [yyyy,mm,dd]
-  var category = document.getElementById('category').value;
-
-  var labelXml = `<?xml version="1.0" encoding="utf-8"?>
+function getBarcodeLabel(){
+  return `<?xml version="1.0" encoding="utf-8"?>
   <DieCutLabel Version="8.0" Units="twips" MediaType="Default">
     <PaperOrientation>Landscape</PaperOrientation>
     <Id>Small30336</Id>
@@ -147,21 +111,71 @@ function printAll(){
       <Bounds X="2440" Y="57" Width="476" Height="1301" />
     </ObjectInfo>
   </DieCutLabel>`;
-  //print from file
+}
+
+function addCi(){
+  if(document.getElementById('formCi').reportValidity()){// form validation check
+    var start = document.getElementById('startNumber');
+    if(start_g === 0){ // first add
+      // disable start input
+      start.disabled = true;
+    }
+    var repeat = document.getElementById('repeat').value;
+    var content = '';
+    var customerId = document.getElementById('customerId').value;
+    var dateCi = document.getElementById('date').value;
+    var category = document.getElementById('category').value;
+    var price = document.getElementById('price').value;
+    
+    for(var i=0; i<repeat;i++){
+      ciArr.push([Number(start.value)+i,category,price]);
+      content += `<tr>
+      <th scope="row">${customerId}</th>
+      <td>${dateCi}</td>
+      <td>${Number(start.value)+i}</td>
+      <td>${category}</td>
+      <td>${price}k</td>
+      <td>
+        <button class="btn-danger deleteBtn">Delete</button>
+        <button class="btn-info reprintBtn" onclick="printOne(this)">Reprint</button>
+      </td>
+    </tr>`; 
+    }
+    document.getElementById('tableCi').getElementsByTagName('tbody')[0].innerHTML += content;
+    // update global start
+    start_g = Number(start.value) + Number(repeat);
+    // update startNumber view;
+    start.value = start_g;
+  }
+}
+
+function printOne(){//reprint button
+
+}
+
+function printAll(){//print button
+  var customerId = document.getElementById('customerId').value;
+  var dateArr = document.getElementById('date').value.split('-'); // [yyyy,mm,dd]
+
+  //copy label file to local
+  // var labelXml = getBarcodeLabel();
+  // var label = dymo.label.framework.openLabelXml(labelXml);
+
+  //print from label file
   var label = DYMO.Label.Framework.Label.Open("../label/cimo.label");
 
-  // var label = dymo.label.framework.openLabelXml(labelXml);
+
  // create label set to print data
  var labelSetBuilder = new dymo.label.framework.LabelSetBuilder();
 
   ciArr.forEach(function(item){
-    var barcode = dateArr[2]+dateArr[1]+(item[0]).pad(4);
-    var custumerIDandItemType = customerId+ '-' + item[1];
-    var price = item[2]+'k';
+    var barcode = dateArr[2]+dateArr[1]+(item[BARCODE]).pad(4);
+    var customerIDandItemType = customerId+ '-' + item[CATEGORY];
+    var price = item[PRICE]+'k';
 
     var record = labelSetBuilder.addRecord();
     record.setText("BARCODE", barcode);
-    record.setText("TEXT", custumerIDandItemType);
+    record.setText("TEXT", customerIDandItemType);
     record.setText("TEXT_1", price);
   });
   
@@ -197,3 +211,5 @@ function printAll(){
 
 document.getElementById('addBtn').addEventListener('click',addCi);
 document.getElementById('printBtn').addEventListener('click',printAll);
+
+//add reprint button function 
