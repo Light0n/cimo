@@ -137,7 +137,7 @@ function addCi(){
       <td>${price}k</td>
       <td>
         <button class="btn-danger deleteBtn">Delete</button>
-        <button class="btn-info reprintBtn" onclick="printOne(this)">Reprint</button>
+        <button class="btn-info reprintBtn" onclick="printOne(this.parentNode.parentNode)">Reprint</button>
       </td>
     </tr>`; 
     }
@@ -149,8 +149,59 @@ function addCi(){
   }
 }
 
-function printOne(){//reprint button
+function printOne(ciTableRow){//reprint button
+  var customerId = document.getElementById('customerId').value;
+  var dateArr = document.getElementById('date').value.split('-'); // [yyyy,mm,dd]
 
+  //copy label file to local
+  // var labelXml = getBarcodeLabel();
+  // var label = dymo.label.framework.openLabelXml(labelXml);
+
+  //print from label file
+  // var label = dymo.label.framework.openLabelFile("../label/cimo.label");
+
+  // create label set to print data
+  var labelSetBuilder = new dymo.label.framework.LabelSetBuilder();
+
+  console.log(ciTableRow);
+
+  // var barcode = dateArr[2]+dateArr[1]+(item[BARCODE]).pad(4);
+  // var customerIDandItemType = customerId+ '-' + item[CATEGORY];
+  // var price = item[PRICE]+'k';
+
+  // var record = labelSetBuilder.addRecord();
+  // record.setText("BARCODE", barcode);
+  // record.setText("TEXT", customerIDandItemType);
+  // record.setText("TEXT_1", price);
+
+  // try{
+  //   // select printer to print on
+  //   // for simplicity sake just use the first LabelWriter printer
+  //   var printers = dymo.label.framework.getPrinters();
+  //   if (printers.length == 0)
+  //       throw "No DYMO printers are installed. Install DYMO printers.";
+
+  //   var printerName = "";
+  //   for (var i = 0; i < printers.length; ++i)
+  //   {
+  //       var printer = printers[i];
+  //       if (printer.printerType == "LabelWriterPrinter")
+  //       {
+  //           printerName = printer.name;
+  //           break;
+  //       }
+  //   }
+    
+  //   if (printerName == "")
+  //       throw "No LabelWriter printers found. Install LabelWriter printer";
+
+  //   // finally print the label
+  //   label.print(printerName, "", labelSetBuilder);
+  // }
+  // catch(e)
+  // {
+  //   alert(e.message || e);
+  // }
 }
 
 function printAll(){//print button
@@ -162,8 +213,7 @@ function printAll(){//print button
   // var label = dymo.label.framework.openLabelXml(labelXml);
 
   //print from label file
-  var label = DYMO.Label.Framework.Label.Open("../label/cimo.label");
-
+  var label = dymo.label.framework.openLabelFile("../label/cimo.label");
 
  // create label set to print data
  var labelSetBuilder = new dymo.label.framework.LabelSetBuilder();
